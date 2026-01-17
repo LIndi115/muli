@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MIRENA KITCHEN | Premium System</title>
+    
+    <meta name="theme-color" content="#0f0f0f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Mirena App">
+    
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Mirena%20Kitchen%20Furniture%22,%22short_name%22:%22Mirena%22,%22start_url%22:%22index.html%22,%22display%22:%22standalone%22,%22background_color%22:%22#0f0f0f%22,%22theme_color%22:%22#d4af37%22,%22icons%22:[{%22src%22:%22https://cdn-icons-png.flaticon.com/512/2163/2163351.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22}]}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        :root {
+            --gold: #d4af37;
+            --gold-glow: rgba(212, 175, 55, 0.3);
+            --dark: #1a1a1a;
+            --bg: #0f0f0f;
+            --text: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            min-height: 100vh; 
+            display: grid; 
+            grid-template-columns: 400px 1fr;
+        }
+
+        /* SIDEBAR / PANELI KONTROLLIT */
+        .sidebar {
+            background: #161616;
+            padding: 30px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .sidebar h2 { 
+            font-family: 'Playfair Display', serif; 
+            color: var(--gold); 
+            margin-bottom: 5px; 
+            text-align: center;
+        }
+        .sidebar p.subtitle {
+            font-size: 0.65rem;
+            color: #888;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+        }
+
+        .group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.7rem; color: #888; margin-bottom: 5px; text-transform: uppercase; font-weight: 700; }
+        input, select { 
+            width: 100%; padding: 12px; background: #222; border: 1px solid #444; 
+            color: white; border-radius: 8px; outline: none; transition: 0.3s;
+        }
+        input:focus { border-color: var(--gold); box-shadow: 0 0 10px var(--gold-glow); }
+
+        .btn-add { 
+            width: 100%; padding: 15px; background: var(--gold); color: black; 
+            border: none; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        .btn-pdf { 
+            width: 100%; padding: 12px; background: white; color: black; 
+            border: none; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 10px;
+        }
+
+        .btn-share {
+            width: 100%; padding: 12px; background: #25d366; color: white;
+            border: none; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 10px;
+        }
+
+        /* PREVIEW AREA */
+        .preview {
+            background: #050505;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            overflow-y: auto;
+        }
+
+        #invoice {
+            background: white;
+            width: 100%;
+            max-width: 800px;
+            padding: 60px;
+            color: #1a1a1a;
+            min-height: 1000px;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 3px solid var(--gold);
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+
+        .logo h1 { font-family: 'Playfair Display', serif; font-size: 2.2rem; line-height: 1; font-weight: 900; }
+        .logo p { color: var(--gold); font-weight: 700; letter-spacing: 2px; font-size: 0.75rem; margin-top: 5px; }
+
+        .info { text-align: right; font-size: 0.85rem; color: #555; }
+
+        .client-box {
+            background: #fdfaf0;
+            padding: 25px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--gold);
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        th { text-align: left; padding: 12px; background: #f8f8f8; font-size: 0.75rem; text-transform: uppercase; border-bottom: 2px solid #ddd; color: #888; }
+        td { padding: 15px 12px; border-bottom: 1px solid #eee; font-size: 0.95rem; }
+
+        .summary-table { width: 320px; margin-left: auto; }
+        .summary-table td { border: none; padding: 10px; }
+        .grand-total { font-size: 1.6rem; font-weight: 900; color: #000; border-top: 2px solid var(--gold) !important; }
+        .paid { color: #27ae60; font-weight: 700; }
+        .rem { color: #c0392b; font-weight: 900; }
+
+        .footer-note { margin-top: 60px; border-top: 1px solid #eee; padding-top: 25px; font-size: 0.75rem; color: #888; line-height: 1.6; }
+
+        @media (max-width: 1100px) {
+            body { grid-template-columns: 1fr; }
+            .sidebar { height: auto; border-right: none; border-bottom: 1px solid #333; }
+            .preview { padding: 20px 10px; }
+            #invoice { padding: 30px 20px; }
+            .logo h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <h2>MIRENA</h2>
+    <p class="subtitle">Kitchen Furniture</p>
+    
+    <div class="group">
+        <label>Emri i Klientit</label>
+        <input type="text" id="cName" placeholder="Psh. Shkumbin Rexhepi" oninput="draw()">
+    </div>
+
+    <div class="group">
+        <label>Artikulli / Pozicioni</label>
+        <input type="text" id="iName" placeholder="Psh. Elementet e Poshtme">
+    </div>
+
+    <div class="group">
+        <label>Materiali i Kuzhinës</label>
+        <select id="iMat">
+            <option value="Medijapan Shkëlqim">Medijapan Shkëlqim</option>
+            <option value="Medijapan Mat">Medijapan Mat</option>
+            <option value="Ivericë Premium">Ivericë Premium</option>
+            <option value="Dru Masiv (Arre/Lis)">Dru Masiv (Arre/Lis)</option>
+            <option value="Mekanizma Blum">Mekanizma Blum</option>
+        </select>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+        <div class="group">
+            <label>Sasia (m' / copë)</label>
+            <input type="number" id="iQty" value="1" step="0.1">
+        </div>
+        <div class="group">
+            <label>Çmimi (€)</label>
+            <input type="number" id="iPrice" placeholder="0.00">
+        </div>
+    </div>
+
+    <button class="btn-add" onclick="addItem()">Shto në Faturë +</button>
+
+    <div class="group" style="margin-top: 30px;">
+        <label>Kapari / Avansi i Paguar (€)</label>
+        <input type="number" id="vAvans" value="0" oninput="draw()">
+    </div>
+
+    <button class="btn-pdf" onclick="savePDF()">Ruaj si PDF 📄</button>
+    <button class="btn-share" onclick="sendWhatsApp()">Dërgo në WhatsApp ✅</button>
+    
+    <button onclick="clearAll()" style="background:none; border:none; color:#ff5e5e; font-size:0.7rem; cursor:pointer; margin-top:20px; width:100%; font-weight:700;">FSHIJ TË GJITHA</button>
+</aside>
+
+<main class="preview">
+    <div id="invoice">
+        <div class="header">
+            <div class="logo">
+                <h1>MIRENA</h1>
+                <p>KITCHEN FURNITURE</p>
+            </div>
+            <div class="info">
+                <strong>NR. PROJEKTIT: #<span id="pNo"></span></strong><br>
+                Data: <span id="pDate"></span><br>
+                Vendi: Drenas, Kosovë<br>
+                Tel: +383 4X XXX XXX
+            </div>
+        </div>
+
+        <div class="client-box">
+            <label>Klienti:</label>
+            <h2 id="pClient">KLIENTI SHEMBULL</h2>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:50%">Përshkrimi i Punës & Materialit</th>
+                    <th>Sasia</th>
+                    <th>Çmimi</th>
+                    <th style="text-align:right">Totali</th>
+                </tr>
+            </thead>
+            <tbody id="pBody"></tbody>
+        </table>
+
+        <table class="summary-table">
+            <tr>
+                <td>Subtotali:</td>
+                <td style="text-align:right" id="pSub">0.00 €</td>
+            </tr>
+            <tr>
+                <td class="paid">Kapari (Avans):</td>
+                <td style="text-align:right" class="paid" id="pPaid">- 0.00 €</td>
+            </tr>
+            <tr class="grand-total">
+                <td>MBETJA:</td>
+                <td style="text-align:right" class="rem" id="pRem">0.00 €</td>
+            </tr>
+        </table>
+
+        <div class="footer-note">
+            <strong>KUSHTET E KONTRATËS:</strong><br>
+            1. Kuzhina prodhohet sipas masave të specifikuara. Çdo ndryshim pas fillimit të punës ka kosto shtesë.<br>
+            2. Afati i dorëzimit: 30 deri 45 ditë pune pas pranimit të kaparit.<br>
+            3. Pagesa e mbetur bëhet menjëherë pas përfundimit të montimit.
+        </div>
+    </div>
+</main>
+
+<script>
+    let list = [];
+    document.getElementById('pDate').innerText = new Date().toLocaleDateString('sq-AL');
+    document.getElementById('pNo').innerText = Math.floor(1000 + Math.random() * 9000);
+
+    function addItem() {
+        const name = document.getElementById('iName').value;
+        const mat = document.getElementById('iMat').value;
+        const qty = parseFloat(document.getElementById('iQty').value);
+        const price = parseFloat(document.getElementById('iPrice').value);
+
+        if(!name || isNaN(price)) return alert("Ju lutem plotësoni përshkrimin dhe çmimin!");
+
+        list.push({ name, mat, qty, price, total: qty * price });
+        draw();
+        
+        document.getElementById('iName').value = "";
+        document.getElementById('iPrice').value = "";
+    }
+
+    function draw() {
+        document.getElementById('pClient').innerText = document.getElementById('cName').value || "KLIENTI SHEMBULL";
+        const body = document.getElementById('pBody');
+        body.innerHTML = "";
+        let sub = 0;
+
+        list.forEach(i => {
+            sub += i.total;
+            body.innerHTML += `
+                <tr>
+                    <td><strong>${i.name}</strong><br><small style="color:#777; font-weight:600">${i.mat}</small></td>
+                    <td>${i.qty}</td>
+                    <td>${i.price.toFixed(2)} €</td>
+                    <td style="text-align:right"><strong>${i.total.toFixed(2)} €</strong></td>
+                </tr>
+            `;
+        });
+
+        const avans = parseFloat(document.getElementById('vAvans').value) || 0;
+        document.getElementById('pSub').innerText = sub.toFixed(2) + " €";
+        document.getElementById('pPaid').innerText = "- " + avans.toFixed(2) + " €";
+        document.getElementById('pRem').innerText = (sub - avans).toFixed(2) + " €";
+    }
+
+    function savePDF() {
+        const el = document.getElementById('invoice');
+        const opt = {
+            margin: 5,
+            filename: `Mirena_Kitchen_${document.getElementById('cName').value || 'Fatura'}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 3, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(el).save();
+    }
+
+    function sendWhatsApp() {
+        const client = document.getElementById('cName').value || "Klient";
+        const mbetja = document.getElementById('pRem').innerText;
+        let text = `💎 *MIRENA KITCHEN FURNITURE* 💎\n👤 Klienti: *${client}*\n\n`;
+        list.forEach(i => {
+            text += `🔸 ${i.name} - *${i.total.toFixed(2)}€*\n`;
+        });
+        text += `\n━━━━━━━━━━━━━━\n💰 *MBETJA PËR PAGESË: ${mbetja}*\n━━━━━━━━━━━━━━\n🙏 Faleminderit!`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    function clearAll() {
+        if(confirm("A dëshironi të fshini të gjitha të dhënat?")) {
+            list = [];
+            document.getElementById('cName').value = "";
+            document.getElementById('vAvans').value = 0;
+            draw();
+        }
+    }
+
+    // Regjistrimi i Service Worker per App Mode
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdmZXRjaCcsIGU9Pnt9KTs=');
+        });
+    }
+</script>
+
+</body>
+</html>
